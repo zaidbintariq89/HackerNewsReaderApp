@@ -2,7 +2,7 @@ package com.android.hackernewsreaderapp;
 
 import com.android.hackernewsreaderapp.data.MockDataGenrator;
 import com.android.hackernewsreaderapp.data.network.ServerApi;
-import com.android.hackernewsreaderapp.databinding.ActivityMainBinding;
+import com.android.hackernewsreaderapp.model.PostModel;
 import com.android.hackernewsreaderapp.viewmodel.MainViewModel;
 
 import org.junit.Before;
@@ -32,7 +32,6 @@ public class MainViewModelTest {
     @Mock private ServerApi serverApi;
 
     private MainViewModel mainViewModel;
-    @Mock private ActivityMainBinding binding;
 
     @Before
     public void setUpMainViewModelTest() {
@@ -50,5 +49,16 @@ public class MainViewModelTest {
     public void testFetchTopStories() throws Exception {
         List<Long> ids = MockDataGenrator.getStoryIds();
         doReturn(Observable.just(ids)).when(serverApi).getTopStories();
+    }
+
+    @Test
+    public void testIsStoriesIdExists() {
+        assert mainViewModel.getStoriesIds() != null;
+    }
+
+    @Test
+    public void testBindStoriesData() throws Exception {
+        PostModel postModel = MockDataGenrator.getPostModel();
+        doReturn(Observable.just(postModel)).when(serverApi).getStoryDetailRX(1L);
     }
 }

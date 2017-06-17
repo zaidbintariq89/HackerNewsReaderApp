@@ -78,9 +78,9 @@ public class MainViewModel extends Observable {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Consumer<List<Long>>() {
                         @Override
-                        public void accept(List<Long> peopleResponse) throws Exception {
+                        public void accept(List<Long> response) throws Exception {
 
-                            changeDataSet(peopleResponse);
+                            changeDataSet(response);
 
                         }
                     }, new Consumer<Throwable>() {
@@ -96,7 +96,7 @@ public class MainViewModel extends Observable {
         }
     }
 
-    public void changeDataSet(List<Long> ids) {
+    private void changeDataSet(List<Long> ids) {
         hideProgressView();
         storiesIds.addAll(ids);
         setChanged();
@@ -105,6 +105,10 @@ public class MainViewModel extends Observable {
 
     public List<Long> getStoriesIds() {
         return storiesIds;
+    }
+
+    public void setStoriesIds(List<Long> storiesIds) {
+        this.storiesIds = storiesIds;
     }
 
     private void unSubscribeFromObservable() {

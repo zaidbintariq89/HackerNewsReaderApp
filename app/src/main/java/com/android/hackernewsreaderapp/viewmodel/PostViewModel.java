@@ -9,8 +9,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Toast;
 
-import com.android.hackernewsreaderapp.data.network.ServerCallback;
-import com.android.hackernewsreaderapp.data.network.ServerError;
+import com.android.hackernewsreaderapp.MainApplication;
 import com.android.hackernewsreaderapp.data.network.ServerTask;
 import com.android.hackernewsreaderapp.data.utility.CommonUtility;
 import com.android.hackernewsreaderapp.model.PostModel;
@@ -18,8 +17,8 @@ import com.android.hackernewsreaderapp.view.CommentsViewActivity;
 
 import java.util.HashMap;
 
-import retrofit2.Call;
-import retrofit2.Response;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
 
 /**
  * Created by zaidbintariq on 14/06/2017.
@@ -50,18 +49,18 @@ public class PostViewModel extends BaseObservable {
     }
 
     public String getPostTitle() {
-        if (post != null && !TextUtils.isEmpty(post.title)) {
+        if (post != null && !TextUtils.isEmpty(post.getTitle())) {
             commentProgress.set(View.GONE);
-            return post.title;
-        } else if (post != null && !TextUtils.isEmpty(post.text)) {
+            return post.getTitle();
+        } else if (post != null && !TextUtils.isEmpty(post.getText())) {
             commentProgress.set(View.GONE);
-            return post.text;
+            return post.getText();
         } else
             return "";
     }
 
     public String getUpdatedAt() {
-        return post != null ? CommonUtility.getTimeEllapseDifference(post.time): "";
+        return post != null ? CommonUtility.getTimeEllapseDifference(post.getTime()) : "";
     }
 
     public int getCommentsVisibility() {
@@ -73,12 +72,12 @@ public class PostViewModel extends BaseObservable {
     }
 
     public String getReplyText() {
-        if (replyModel != null && !TextUtils.isEmpty(replyModel.title)) {
+        if (replyModel != null && !TextUtils.isEmpty(replyModel.getTitle())) {
             replyView.set(View.VISIBLE);
-            return replyModel.title;
-        } else if (replyModel != null && !TextUtils.isEmpty(replyModel.text)) {
+            return replyModel.getTitle();
+        } else if (replyModel != null && !TextUtils.isEmpty(replyModel.getText())) {
             replyView.set(View.VISIBLE);
-            return replyModel.text;
+            return replyModel.getText();
         } else
             return "";
     }
@@ -107,11 +106,11 @@ public class PostViewModel extends BaseObservable {
     }
 
     private void launchStoryActivity() {
-        context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(post.url)));
+        context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(post.getUrl())));
     }
 
     private void launchCommentsActivity() {
-        context.startActivity(CommentsViewActivity.getCommentsActivityIntent(context, post.kids));
+        context.startActivity(CommentsViewActivity.getCommentsActivityIntent(context, post.getKids()));
     }
 
     private void addItem(long id, PostModel post) {
@@ -121,8 +120,8 @@ public class PostViewModel extends BaseObservable {
         this.post = post;
 
         if (post != null && post.postType == PostModel.PostType.COMMENT &&
-                post.kids != null && post.kids.length > 0) {
-            long replyId = post.kids[0];
+                post.getKids() != null && post.getKids().length > 0) {
+            long replyId = post.getKids()[0];
             fetchReply(replyId);
         } else {
             notifyChange();
@@ -130,34 +129,44 @@ public class PostViewModel extends BaseObservable {
     }
 
     private void fetchReply(final long id) {
-        Call<PostModel> call = ServerTask.getInstance().getServices().getStoryDetail(id);
-        call.enqueue(new ServerCallback<PostModel>() {
-            @Override
-            public void onFailure(ServerError restError) {
-                Toast.makeText(context, restError.getMessage(), Toast.LENGTH_SHORT).show();
-            }
+        MainApplication mainApplication = MainApplication.create(context);
+        ServerTask.getInstance().getServices().getStoryDetailRX(id)
+                .subscribeOn(mainApplication.subscribeScheduler())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<PostModel>() {
+                    @Override
+                    public void accept(PostModel response) throws Exception {
 
-            @Override
-            public void onSuccess(Response<PostModel> response) {
+                        replyModel = response;
+                        notifyChange();
 
-                replyModel = response.body();
-                notifyChange();
-            }
-        });
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void fetchStory(final long id) {
-        Call<PostModel> call = ServerTask.getInstance().getServices().getStoryDetail(id);
-        call.enqueue(new ServerCallback<PostModel>() {
-            @Override
-            public void onFailure(ServerError restError) {
-                Toast.makeText(context, restError.getMessage(), Toast.LENGTH_SHORT).show();
-            }
 
-            @Override
-            public void onSuccess(Response<PostModel> response) {
-                addItem(id, response.body());
-            }
-        });
+        MainApplication mainApplication = MainApplication.create(context);
+        ServerTask.getInstance().getServices().getStoryDetailRX(id)
+                .subscribeOn(mainApplication.subscribeScheduler())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<PostModel>() {
+                    @Override
+                    public void accept(PostModel response) throws Exception {
+
+                        addItem(id, response);
+
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 }

@@ -1,5 +1,7 @@
 package com.android.hackernewsreaderapp.data;
 
+import com.android.hackernewsreaderapp.model.PostModel;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,5 +17,18 @@ public class MockDataGenrator {
             ids.add((long) i);
         }
         return ids;
+    }
+
+    public static PostModel getPostModel() {
+        PostModel postModel = new PostModel();
+        postModel.setId(1L);
+        postModel.setBy("Zaid");
+        postModel.setTitle("Testing post");
+        postModel.setTime(1497671284L);
+        postModel.setUrl("http://www.google.com");
+        long[] kids = {2L,3L,4L,5L,6L};
+        postModel.setKids(kids);
+
+        return postModel;
     }
 }

@@ -8,13 +8,13 @@ import com.google.gson.annotations.SerializedName;
 
 public class PostModel {
 
-    public Long id;
-    public String by;
-    public Long time;
-    public long[] kids;
-    public String url;
-    public String title;
-    public String text;
+    private Long id;
+    private String by;
+    private Long time;
+    private long[] kids;
+    private String url;
+    private String title;
+    private String text;
     @SerializedName("type")
     public PostType postType;
 
@@ -44,5 +44,62 @@ public class PostModel {
         }
     }
 
-    public PostModel() { }
+    public PostModel() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getBy() {
+        return by;
+    }
+
+    public void setBy(String by) {
+        this.by = by;
+    }
+
+    public Long getTime() {
+        return time;
+    }
+
+    public void setTime(Long time) {
+        this.time = time;
+    }
+
+    public long[] getKids() {
+        return kids;
+    }
+
+    public void setKids(long[] kids) {
+        this.kids = kids;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
 }

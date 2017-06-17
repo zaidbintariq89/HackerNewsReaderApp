@@ -39,6 +39,10 @@ android {
 
 dependencies {
 
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+
     compile supportDependencies.appCompat
     compile supportDependencies.design
     compile supportDependencies.recyclerView
