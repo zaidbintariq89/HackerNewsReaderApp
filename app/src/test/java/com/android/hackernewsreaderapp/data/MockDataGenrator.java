@@ -24,10 +24,12 @@ public class MockDataGenrator {
         postModel.setId(1L);
         postModel.setBy("Zaid");
         postModel.setTitle("Testing post");
+        postModel.setText("Testing post");
         postModel.setTime(1497671284L);
         postModel.setUrl("http://www.google.com");
         long[] kids = {2L,3L,4L,5L,6L};
         postModel.setKids(kids);
+        postModel.postType = PostModel.PostType.STORY;
 
         return postModel;
     }

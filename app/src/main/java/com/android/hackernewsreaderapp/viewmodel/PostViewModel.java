@@ -34,6 +34,15 @@ public class PostViewModel extends BaseObservable {
     private PostModel replyModel;
     private HashMap<Long, PostModel> mPosts;
 
+    // this is for unit test
+    public PostViewModel(Context context,PostModel model) {
+        this.context = context;
+        post = model;
+
+        commentProgress = new ObservableInt(View.VISIBLE);
+        replyView = new ObservableInt(View.GONE);
+    }
+
     public PostViewModel(Context context, long id, HashMap<Long, PostModel> posts) {
         this.context = context;
         this.mPosts = posts;
@@ -94,6 +103,21 @@ public class PostViewModel extends BaseObservable {
                 }
             }
         };
+    }
+
+    // for unit test
+    public void onItemClick(View view) {
+        PostModel.PostType postType = post.postType;
+        if (postType == PostModel.PostType.JOB || postType == PostModel.PostType.STORY) {
+            launchStoryActivity();
+        } else if (postType == PostModel.PostType.ASK || postType == PostModel.PostType.COMMENT) {
+            launchCommentsActivity();
+        }
+    }
+
+    public void setPost(PostModel post) {
+        this.post = post;
+        notifyChange();
     }
 
     public View.OnClickListener onClickComments() {

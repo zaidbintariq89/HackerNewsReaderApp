@@ -1,5 +1,7 @@
 package com.android.hackernewsreaderapp;
 
+import android.view.View;
+
 import com.android.hackernewsreaderapp.data.MockDataGenrator;
 import com.android.hackernewsreaderapp.data.network.ServerApi;
 import com.android.hackernewsreaderapp.model.PostModel;
@@ -15,6 +17,7 @@ import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
 import java.util.List;
+import static org.junit.Assert.assertEquals;
 
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
@@ -32,17 +35,26 @@ public class MainViewModelTest {
     @Mock private ServerApi serverApi;
 
     private MainViewModel mainViewModel;
+    private MainApplication mainApplication;
 
     @Before
     public void setUpMainViewModelTest() {
         // inject the mocks
         MockitoAnnotations.initMocks(this);
 
-        MainApplication mainApplication = (MainApplication) RuntimeEnvironment.application;
+        mainApplication = (MainApplication) RuntimeEnvironment.application;
         mainApplication.setScheduler(Schedulers.trampoline());
         mainApplication.setServerApi(serverApi);
 
         mainViewModel = new MainViewModel(mainApplication);
+    }
+
+    @Test
+    public void testIsStoryIdsExists() {
+        List<Long> ids = MockDataGenrator.getStoryIds();
+        mainViewModel.setStoriesIds(ids);
+
+        assertEquals(ids,mainViewModel.getStoriesIds());
     }
 
     @Test
@@ -51,9 +63,10 @@ public class MainViewModelTest {
         doReturn(Observable.just(ids)).when(serverApi).getTopStories();
     }
 
-    @Test
-    public void testIsStoriesIdExists() {
-        assert mainViewModel.getStoriesIds() != null;
+    @Test public void ensureTheViewsAreInitializedCorrectly() throws Exception {
+        mainViewModel.initializeViews();
+        assertEquals(View.GONE, mainViewModel.postRecycler.get());
+        assertEquals(View.VISIBLE, mainViewModel.postProgress.get());
     }
 
     @Test
