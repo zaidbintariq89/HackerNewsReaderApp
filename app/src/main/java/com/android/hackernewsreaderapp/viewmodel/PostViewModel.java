@@ -6,8 +6,8 @@ import android.databinding.BaseObservable;
 import android.databinding.ObservableInt;
 import android.net.Uri;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.android.hackernewsreaderapp.data.network.ServerCallback;
 import com.android.hackernewsreaderapp.data.network.ServerError;
@@ -28,14 +28,19 @@ import retrofit2.Response;
 public class PostViewModel extends BaseObservable {
 
     public ObservableInt commentProgress;
+    public ObservableInt replyView;
+
     private Context context;
     private PostModel post;
+    private PostModel replyModel;
     private HashMap<Long, PostModel> mPosts;
 
     public PostViewModel(Context context, long id, HashMap<Long, PostModel> posts) {
         this.context = context;
         this.mPosts = posts;
+
         commentProgress = new ObservableInt(View.VISIBLE);
+        replyView = new ObservableInt(View.GONE);
 
         if (!mPosts.containsKey(id)) {
             fetchStory(id);
@@ -61,6 +66,21 @@ public class PostViewModel extends BaseObservable {
 
     public int getCommentsVisibility() {
         return post != null && post.postType == PostModel.PostType.COMMENT ? View.GONE : View.VISIBLE;
+    }
+
+    public int getReplyVisibility() {
+        return replyModel != null && replyModel.postType == PostModel.PostType.COMMENT ? View.VISIBLE : View.GONE;
+    }
+
+    public String getReplyText() {
+        if (replyModel != null && !TextUtils.isEmpty(replyModel.title)) {
+            replyView.set(View.VISIBLE);
+            return replyModel.title;
+        } else if (replyModel != null && !TextUtils.isEmpty(replyModel.text)) {
+            replyView.set(View.VISIBLE);
+            return replyModel.text;
+        } else
+            return "";
     }
 
     public View.OnClickListener onClickPost() {
@@ -99,7 +119,31 @@ public class PostViewModel extends BaseObservable {
             mPosts.put(id, post);
         }
         this.post = post;
-        notifyChange();
+
+        if (post != null && post.postType == PostModel.PostType.COMMENT &&
+                post.kids != null && post.kids.length > 0) {
+            long replyId = post.kids[0];
+            fetchReply(replyId);
+        } else {
+            notifyChange();
+        }
+    }
+
+    private void fetchReply(final long id) {
+        Call<PostModel> call = ServerTask.getInstance().getServices().getStoryDetail(id);
+        call.enqueue(new ServerCallback<PostModel>() {
+            @Override
+            public void onFailure(ServerError restError) {
+                Toast.makeText(context, restError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSuccess(Response<PostModel> response) {
+
+                replyModel = response.body();
+                notifyChange();
+            }
+        });
     }
 
     private void fetchStory(final long id) {
@@ -107,7 +151,7 @@ public class PostViewModel extends BaseObservable {
         call.enqueue(new ServerCallback<PostModel>() {
             @Override
             public void onFailure(ServerError restError) {
-                Log.e("Adapter", restError.getMessage());
+                Toast.makeText(context, restError.getMessage(), Toast.LENGTH_SHORT).show();
             }
 
             @Override

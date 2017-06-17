@@ -68,6 +68,7 @@ public class MainViewModel extends Observable {
 
     public void fetchTopStories() {
         if (context != null) {
+            storiesIds.clear();
             initializeViews();
 
             MainApplication mainApplication = MainApplication.create(context);

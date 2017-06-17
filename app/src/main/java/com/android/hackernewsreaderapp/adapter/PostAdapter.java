@@ -65,4 +65,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.BindingHolder>
             this.binding = binding;
         }
     }
+
+    public void resetList() {
+        mPosts.clear();
+        storiesIds.clear();
+        notifyDataSetChanged();
+    }
 }

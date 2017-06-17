@@ -6,35 +6,42 @@
 
         <variable
             name="mainViewModel"
-            type="com.android.hackernewsreaderapp.viewmodel.MainViewModel"/>
+            type="com.android.hackernewsreaderapp.viewmodel.MainViewModel" />
     </data>
 
-    <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    <android.support.v4.widget.SwipeRefreshLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:background="@color/grey"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
-        <ProgressBar
-            android:id="@+id/progress_post"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:visibility="@{mainViewModel.postProgress}"/>
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclerView"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:divider="@null"
-            android:orientation="vertical"
-            android:clipToPadding="false"
-            android:scrollbars="none"
-            android:layout_margin="10dp"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            app:visibility="@{mainViewModel.postRecycler}"
-            tools:listitem="@layout/post_row_item"/>
+            android:background="@color/grey"
+            android:gravity="center"
+            android:orientation="vertical">
 
-    </LinearLayout>
+            <ProgressBar
+                android:id="@+id/progress_post"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:visibility="@{mainViewModel.postProgress}" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="10dp"
+                android:clipToPadding="false"
+                android:divider="@null"
+                android:orientation="vertical"
+                android:scrollbars="none"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                app:visibility="@{mainViewModel.postRecycler}"
+                tools:listitem="@layout/post_row_item" />
+
+        </LinearLayout>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </layout>
