@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-        <variable name="viewModel" type="com.android.hackernewsreaderapp.viewmodel.PostViewModel" />
+
+        <import type="android.text.Html" />
+
+        <variable
+            name="viewModel"
+            type="com.android.hackernewsreaderapp.viewmodel.PostViewModel" />
     </data>
 
-    <android.support.v7.widget.CardView
-        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:id="@+id/card_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
         android:layout_marginBottom="2dp"
+        android:layout_marginTop="2dp"
         card_view:cardCornerRadius="2dp"
         card_view:cardUseCompatPadding="true">
 
@@ -20,66 +25,73 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clickable="true"
-            android:orientation="vertical"
-            android:onClick="@{viewModel.onClickPost}">
+            android:onClick="@{viewModel.onClickPost}"
+            android:orientation="vertical">
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@android:color/white"
                 android:orientation="vertical"
-                android:padding="16dp"
-                android:background="@android:color/white">
+                android:padding="16dp">
+
+                <ProgressBar
+                    android:id="@+id/progress_comment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    app:visibility="@{viewModel.commentProgress}"/>
 
                 <TextView
                     android:id="@+id/text_post_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
-                    android:text="@{viewModel.postTitle}"
+                    android:onClick="@{viewModel.onClickPost}"
+                    android:text="@{Html.fromHtml(viewModel.postTitle)}"
                     android:textColor="@android:color/black"
                     android:textSize="16sp"
-                    android:onClick="@{viewModel.onClickPost}"/>
+                    android:autoLink="web"/>
 
-            </LinearLayout>
+                <TextView
+                    android:id="@+id/text_updated_at"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/white"
+                    android:text="@{viewModel.updatedAt}"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textSize="12sp"
+                    android:layout_marginTop="10dp"
+                    android:layout_below="@+id/text_post_title"
+                    android:layout_alignParentRight="true"/>
+
+            </RelativeLayout>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="@android:color/darker_gray" />
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="#ffffff">
-
-                <TextView
-                    android:id="@+id/text_view_post"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp"
-                    android:background="@android:color/white"
-                    android:clickable="true"
-                    android:textColor="@android:color/black"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:text="View"
-                    android:onClick="@{viewModel.onClickPost}"/>
+                android:background="#ffffff"
+                android:visibility="@{viewModel.commentsVisibility}">
 
                 <TextView
                     android:id="@+id/text_view_comments"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:padding="16dp"
                     android:background="@android:color/white"
                     android:clickable="true"
-                    android:textColor="@android:color/black"
-                    android:textSize="12sp"
-                    android:text="Comments"
                     android:onClick="@{viewModel.onClickComments}"
-                    android:visibility="@{viewModel.commentsVisibility}"/>
+                    android:padding="16dp"
+                    android:text="Comments"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
 
-            </LinearLayout>
+            </RelativeLayout>
 
         </LinearLayout>
 

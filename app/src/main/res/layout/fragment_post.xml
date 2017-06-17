@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="mainViewModel"
+            type="com.android.hackernewsreaderapp.viewmodel.MainViewModel"/>
+    </data>
+
+    <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:background="@color/grey"
+        android:orientation="vertical">
+
+        <ProgressBar
+            android:id="@+id/progress_post"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:visibility="@{mainViewModel.postProgress}"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@null"
+            android:orientation="vertical"
+            android:clipToPadding="false"
+            android:scrollbars="none"
+            android:layout_margin="10dp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            app:visibility="@{mainViewModel.postRecycler}"
+            tools:listitem="@layout/post_row_item"/>
+
+    </LinearLayout>
+
+</layout>

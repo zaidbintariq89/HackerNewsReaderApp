@@ -28,6 +28,7 @@ public class MainViewModel extends Observable {
     public ObservableInt postRecycler;
 
     private List<Long> storiesIds;
+    private long[] comentIds;
     private Context context;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
@@ -48,33 +49,54 @@ public class MainViewModel extends Observable {
         postRecycler.set(View.VISIBLE);
     }
 
-    public void fetchTopStories() {
-        initializeViews();
-
-        MainApplication mainApplication = MainApplication.create(context);
-
-        Disposable disposable = ServerTask.getInstance().getServices().getTopStories()
-                .subscribeOn(mainApplication.subscribeScheduler())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<List<Long>>() {
-                    @Override
-                    public void accept(List<Long> peopleResponse) throws Exception {
-                        hideProgressView();
-                        changeDataSet(peopleResponse);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        postProgress.set(View.GONE);
-                        postRecycler.set(View.GONE);
-                        Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-        compositeDisposable.add(disposable);
+    public List<Long> getComentIds() {
+        List<Long> ids = new ArrayList<>();
+        if (comentIds != null && comentIds.length >  0) {
+            for (long id : comentIds) {
+                ids.add(id);
+            }
+        }
+        return ids;
     }
 
-    private void changeDataSet(List<Long> ids) {
+    public void setComentIds(long[] comentIds) {
+        this.comentIds = comentIds;
+        hideProgressView();
+        setChanged();
+        notifyObservers();
+    }
+
+    public void fetchTopStories() {
+        if (context != null) {
+            initializeViews();
+
+            MainApplication mainApplication = MainApplication.create(context);
+
+            Disposable disposable = ServerTask.getInstance().getServices().getTopStories()
+                    .subscribeOn(mainApplication.subscribeScheduler())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<List<Long>>() {
+                        @Override
+                        public void accept(List<Long> peopleResponse) throws Exception {
+
+                            changeDataSet(peopleResponse);
+
+                        }
+                    }, new Consumer<Throwable>() {
+                        @Override
+                        public void accept(Throwable throwable) throws Exception {
+                            postProgress.set(View.GONE);
+                            postRecycler.set(View.GONE);
+                            Toast.makeText(context, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+            compositeDisposable.add(disposable);
+        }
+    }
+
+    public void changeDataSet(List<Long> ids) {
+        hideProgressView();
         storiesIds.addAll(ids);
         setChanged();
         notifyObservers();

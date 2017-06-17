@@ -3,14 +3,18 @@ package com.android.hackernewsreaderapp.viewmodel;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.BaseObservable;
+import android.databinding.ObservableInt;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
 import com.android.hackernewsreaderapp.data.network.ServerCallback;
 import com.android.hackernewsreaderapp.data.network.ServerError;
 import com.android.hackernewsreaderapp.data.network.ServerTask;
+import com.android.hackernewsreaderapp.data.utility.CommonUtility;
 import com.android.hackernewsreaderapp.model.PostModel;
+import com.android.hackernewsreaderapp.view.CommentsViewActivity;
 
 import java.util.HashMap;
 
@@ -23,27 +27,40 @@ import retrofit2.Response;
 
 public class PostViewModel extends BaseObservable {
 
+    public ObservableInt commentProgress;
     private Context context;
     private PostModel post;
-    private HashMap<Long,PostModel> mPosts;
+    private HashMap<Long, PostModel> mPosts;
 
-    public PostViewModel(Context context,long id,HashMap<Long,PostModel> posts) {
+    public PostViewModel(Context context, long id, HashMap<Long, PostModel> posts) {
         this.context = context;
         this.mPosts = posts;
+        commentProgress = new ObservableInt(View.VISIBLE);
 
         if (!mPosts.containsKey(id)) {
             fetchStory(id);
         } else {
-            addItem(id,mPosts.get(id));
+            addItem(id, mPosts.get(id));
         }
     }
 
     public String getPostTitle() {
-        return post == null ? "" : post.title;
+        if (post != null && !TextUtils.isEmpty(post.title)) {
+            commentProgress.set(View.GONE);
+            return post.title;
+        } else if (post != null && !TextUtils.isEmpty(post.text)) {
+            commentProgress.set(View.GONE);
+            return post.text;
+        } else
+            return "";
+    }
+
+    public String getUpdatedAt() {
+        return post != null ? CommonUtility.getTimeEllapseDifference(post.time): "";
     }
 
     public int getCommentsVisibility() {
-        return post != null && post.postType == PostModel.PostType.STORY && post.kids == null ? View.GONE : View.VISIBLE;
+        return post != null && post.postType == PostModel.PostType.COMMENT ? View.GONE : View.VISIBLE;
     }
 
     public View.OnClickListener onClickPost() {
@@ -74,12 +91,12 @@ public class PostViewModel extends BaseObservable {
     }
 
     private void launchCommentsActivity() {
-//        context.startActivity(CommentsActivity.getStartIntent(context, post));
+        context.startActivity(CommentsViewActivity.getCommentsActivityIntent(context, post.kids));
     }
 
-    private void addItem(long id , PostModel post) {
+    private void addItem(long id, PostModel post) {
         if (!mPosts.containsKey(id)) {
-            mPosts.put(id,post);
+            mPosts.put(id, post);
         }
         this.post = post;
         notifyChange();
@@ -90,12 +107,12 @@ public class PostViewModel extends BaseObservable {
         call.enqueue(new ServerCallback<PostModel>() {
             @Override
             public void onFailure(ServerError restError) {
-                Log.e("Adapter",restError.getMessage());
+                Log.e("Adapter", restError.getMessage());
             }
 
             @Override
             public void onSuccess(Response<PostModel> response) {
-                addItem(id,response.body());
+                addItem(id, response.body());
             }
         });
     }

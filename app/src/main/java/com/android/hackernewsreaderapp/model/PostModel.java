@@ -2,8 +2,6 @@ package com.android.hackernewsreaderapp.model;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
-
 /**
  * Created by zaidbintariq on 14/06/2017.
  */
@@ -13,7 +11,7 @@ public class PostModel {
     public Long id;
     public String by;
     public Long time;
-    public ArrayList<Long> kids;
+    public long[] kids;
     public String url;
     public String title;
     public String text;
