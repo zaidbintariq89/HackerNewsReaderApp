@@ -23,6 +23,7 @@ import org.robolectric.annotation.Config;
 import io.reactivex.schedulers.Schedulers;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
@@ -56,15 +57,18 @@ public class PostViewModelTest {
     @Test
     public void shouldGetPostTitle() throws Exception {
         PostModel postModel = MockDataGenrator.getPostModel();
-
         assertEquals(postModel.getTitle(), postViewModel.getPostTitle());
     }
 
     @Test
     public void shouldGetUpdateAt() throws Exception {
         PostModel postModel = MockDataGenrator.getPostModel();
-
         assertEquals(CommonUtility.getTimeEllapseDifference(postModel.getTime()), postViewModel.getUpdatedAt());
+    }
+
+    @Test
+    public void shouldHaveKidsData() throws Exception {
+        assertNotNull(postViewModel.getKids());
     }
 
     @Test public void shouldStartCommentsActivityOnItemClick() throws Exception {

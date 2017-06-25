@@ -80,6 +80,10 @@ public class PostViewModel extends BaseObservable {
         return replyModel != null && replyModel.postType == PostModel.PostType.COMMENT ? View.VISIBLE : View.GONE;
     }
 
+    public long[] getKids() {
+        return post != null && post.getKids() != null ? post.getKids() : null;
+    }
+
     public String getReplyText() {
         if (replyModel != null && !TextUtils.isEmpty(replyModel.getTitle())) {
             replyView.set(View.VISIBLE);

@@ -2,6 +2,7 @@ package com.android.hackernewsreaderapp;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.annotation.UiThreadTest;
 import android.support.test.filters.MediumTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -14,9 +15,16 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static android.support.test.espresso.Espresso.onData;
+import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.anything;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
@@ -39,17 +47,74 @@ public class MainPostTestActivity {
     }
 
     @Test
-    public void ensureListViewIsPresent() throws Exception {
-        MainActivity activity = rule.getActivity();
-        View viewById = activity.findViewById(R.id.recyclerView);
+    public void testAProgressBarShouldGone() {
+        final MainActivity activity = rule.getActivity();
 
-        assertThat(viewById,notNullValue());
-        assertThat(viewById, instanceOf(RecyclerView.class));
-        RecyclerView listView = (RecyclerView) viewById;
+        final View progress = activity.findViewById(R.id.progress_post);
+        final View viewById = activity.findViewById(R.id.recyclerView);
 
-        RecyclerView.Adapter adapter = listView.getAdapter();
-        assertThat(adapter, instanceOf(RecyclerView.Adapter.class));
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
 
-        assertThat(viewById.getVisibility(),is(View.GONE));
+                progress.setVisibility(View.GONE);
+                viewById.setVisibility(View.VISIBLE);
+
+                assertThat(progress.getVisibility(),is(View.GONE));
+            }
+        });
+
+    }
+
+    @Test
+    public void testBListViewIsPresent() throws Exception {
+        final MainActivity activity = rule.getActivity();
+
+        final View progress = activity.findViewById(R.id.progress_post);
+        final View viewById = activity.findViewById(R.id.recyclerView);
+
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                progress.setVisibility(View.GONE);
+                viewById.setVisibility(View.VISIBLE);
+
+                assertThat(viewById,notNullValue());
+                assertThat(viewById, instanceOf(RecyclerView.class));
+                RecyclerView listView = (RecyclerView) viewById;
+
+                RecyclerView.Adapter adapter = listView.getAdapter();
+                assertThat(adapter, instanceOf(RecyclerView.Adapter.class));
+
+                assertThat(viewById.getVisibility(),is(View.VISIBLE));
+            }
+        });
+    }
+
+    @UiThreadTest
+    public void testCListViewShouldBindData() {
+        onData(anything())
+                .inAdapterView(withId(R.id.recyclerView))
+                .check(matches(isDisplayed()));
+    }
+
+    @UiThreadTest
+    public void testDCommentsViewShouldVisible() {
+        onData(anything())
+                .inAdapterView(withId(R.id.recyclerView))
+                .atPosition(0)
+                .onChildView(withText("Comments"))
+                .check(matches(isDisplayed()));
+    }
+
+    @UiThreadTest
+    public void testECommentsViewShouldBeClickable() {
+
+        onData(anything())
+                .inAdapterView(withId(R.id.recyclerView))
+                .atPosition(0)
+                .onChildView(withText("Comments"))
+                .perform(click());
     }
 }

@@ -49,12 +49,10 @@ public class MainViewModelTest {
         mainViewModel = new MainViewModel(mainApplication);
     }
 
-    @Test
-    public void testIsStoryIdsExists() {
-        List<Long> ids = MockDataGenrator.getStoryIds();
-        mainViewModel.setStoriesIds(ids);
-
-        assertEquals(ids,mainViewModel.getStoriesIds());
+    @Test public void ensureTheViewsAreInitializedCorrectly() throws Exception {
+        mainViewModel.initializeViews();
+        assertEquals(View.GONE, mainViewModel.postRecycler.get());
+        assertEquals(View.VISIBLE, mainViewModel.postProgress.get());
     }
 
     @Test
@@ -63,14 +61,16 @@ public class MainViewModelTest {
         doReturn(Observable.just(ids)).when(serverApi).getTopStories();
     }
 
-    @Test public void ensureTheViewsAreInitializedCorrectly() throws Exception {
-        mainViewModel.initializeViews();
-        assertEquals(View.GONE, mainViewModel.postRecycler.get());
-        assertEquals(View.VISIBLE, mainViewModel.postProgress.get());
+    @Test
+    public void testStoriesIdsExist() {
+        List<Long> ids = MockDataGenrator.getStoryIds();
+        mainViewModel.setStoriesIds(ids);
+
+        assertEquals(ids,mainViewModel.getStoriesIds());
     }
 
     @Test
-    public void testBindStoriesData() throws Exception {
+    public void testGetStoriesDetails() throws Exception {
         PostModel postModel = MockDataGenrator.getPostModel();
         doReturn(Observable.just(postModel)).when(serverApi).getStoryDetailRX(1L);
     }
